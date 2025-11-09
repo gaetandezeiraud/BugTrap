@@ -23,14 +23,23 @@
 #include "LogLink.h"
 #include "VersionInfo.h"
 
-#if defined _M_IX86
-  #define BUGTRAP_PLATFORM   _T("Win32-x86")
-#elif defined _M_X64
-  #define BUGTRAP_PLATFORM   _T("Win64-x64")
-#else
+#if defined _MANAGED
+ #if defined _M_IX86
+  #define BUGTRAP_PLATFORM   _T(".NET-x86")
+ #elif defined _M_X64
+  #define BUGTRAP_PLATFORM   _T(".NET-x64")
+ #else
   #error CPU architecture is not supported.
+ #endif
+#else
+ #if defined _M_IX86
+  #define BUGTRAP_PLATFORM   _T("Win32-x86")
+ #elif defined _M_X64
+  #define BUGTRAP_PLATFORM   _T("Win64-x64")
+ #else
+  #error CPU architecture is not supported.
+ #endif
 #endif
-
 
 #define BUGTRAP_TITLE   _T("BugTrap for ") BUGTRAP_PLATFORM
 

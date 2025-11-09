@@ -13,7 +13,6 @@ This project is a fork of https://github.com/bchavez/BugTrap. With a different p
 * Remove `WaitDlg` (doesn't seems very revelant to the today hardware standard, just a visual "flash"), `AnimProgressBar` and `ThemeXP`
 * Support only Visual Studio 2019 and 2022 (VS2022 recommanded)
 * Support https server
-* Remove .Net framework support and N version of BugTrap (because .NET framework is deprecated and the existing code doesn't support .NET Core)
 * Remove "Mail to" feature
 * Remove CrashExplorer (supposed to be replaced by a web interface)
 * Remove `AboutDlg`

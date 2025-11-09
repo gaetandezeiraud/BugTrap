@@ -1,12 +1,14 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.9.34622.214
+# Visual Studio 2022
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BugTrapConsoleTest", "Examples\BugTrapConsoleTest\BugTrapConsoleTest.vs2022.vcxproj", "{6CB4122E-E337-4514-96E7-E60D2487BA5F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BugTrapLogTest", "Examples\BugTrapLogTest\BugTrapLogTest.vs2022.vcxproj", "{5A802CAA-D386-4678-9D57-4C6DAAF25E2D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BugTrapManCppTest", "Examples\BugTrapManCppTest\BugTrapManCppTest.vs2022.vcxproj", "{3C5FAB69-6811-4E83-890B-AD9E1DA64881}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BugTrapNetTest.vs2022", "Examples\BugTrapNetTest\BugTrapNetTest.vs2022.csproj", "{2865A152-A874-4A04-80BD-C7BA15CB023C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BugTrap", "Client\BugTrap.vs2022.vcxproj", "{E8CF1ADA-264A-4127-86C2-FD7057D3792C}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -87,6 +89,24 @@ Global
 		{3C5FAB69-6811-4E83-890B-AD9E1DA64881}.Unicode Release|.NET x86.ActiveCfg = Release|Win32
 		{3C5FAB69-6811-4E83-890B-AD9E1DA64881}.Unicode Release|Win32.ActiveCfg = Release|Win32
 		{3C5FAB69-6811-4E83-890B-AD9E1DA64881}.Unicode Release|x64.ActiveCfg = Release|Win32
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Debug|.NET x86.ActiveCfg = Debug|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Debug|.NET x86.Build.0 = Debug|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Debug|Win32.ActiveCfg = Debug|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Debug|Win32.Build.0 = Debug|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Debug|x64.ActiveCfg = Debug|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Release|.NET x86.ActiveCfg = Release|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Release|.NET x86.Build.0 = Release|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Release|Win32.ActiveCfg = Release|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Release|Win32.Build.0 = Release|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Release|x64.ActiveCfg = Release|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Unicode Debug|.NET x86.ActiveCfg = Debug|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Unicode Debug|Win32.ActiveCfg = Debug|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Unicode Debug|Win32.Build.0 = Debug|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Unicode Debug|x64.ActiveCfg = Debug|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Unicode Release|.NET x86.ActiveCfg = Release|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Unicode Release|Win32.ActiveCfg = Release|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Unicode Release|Win32.Build.0 = Release|x86
+		{2865A152-A874-4A04-80BD-C7BA15CB023C}.Unicode Release|x64.ActiveCfg = Release|x86
 		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Debug|.NET x86.ActiveCfg = .NET Debug|Win32
 		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Debug|.NET x86.Build.0 = .NET Debug|Win32
 		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Debug|Win32.ActiveCfg = Debug|Win32
@@ -139,5 +159,6 @@ Global
 		{6CB4122E-E337-4514-96E7-E60D2487BA5F} = {21B4173A-4A67-48D1-9C37-17BDE2DFDEC9}
 		{5A802CAA-D386-4678-9D57-4C6DAAF25E2D} = {21B4173A-4A67-48D1-9C37-17BDE2DFDEC9}
 		{3C5FAB69-6811-4E83-890B-AD9E1DA64881} = {21B4173A-4A67-48D1-9C37-17BDE2DFDEC9}
+		{2865A152-A874-4A04-80BD-C7BA15CB023C} = {21B4173A-4A67-48D1-9C37-17BDE2DFDEC9}
 	EndGlobalSection
 EndGlobal

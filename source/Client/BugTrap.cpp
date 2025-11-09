@@ -244,7 +244,10 @@ static void InitSymEngine(CSymEngine::CEngineParams& rParams)
 {
 	// Request additional privileges.
 	RequestMorePrivileges();
-
+#ifdef _MANAGED
+	// Flush contents of all .NET trace listeners and close all log files.
+	NetThunks::FlushTraceListeners();
+#endif
 	// Flush contents of all open log files ands disable logging.
 	FlushLogFiles(true);
 	_ASSERTE(! g_bLoggingEnabled && ! g_dwNumLogRequests);
@@ -279,7 +282,11 @@ static inline void ReadVersionInfo(void)
 {
 	if (*g_szAppName == _T('\0'))
 	{
+#ifdef _MANAGED
+		NetThunks::ReadVersionInfo();
+#else
 		BT_ReadVersionInfo(NULL);
+#endif
 	}
 }
 
@@ -308,11 +315,17 @@ static BOOL HandleException(CSymEngine::CEngineParams& rParams)
 		// Call user error handler before BugTrap user interface.
 		if (g_pfnPreErrHandler != NULL)
 			(*g_pfnPreErrHandler)(g_nPreErrHandlerParam);
+#ifdef _MANAGED
+		NetThunks::FireBeforeUnhandledExceptionEvent();
+#endif
 		// Read version info if application name is not specified.
 		ReadVersionInfo();
 		// Execute BugTrap action.
 		StartHandlerThread();
 		// Call user error handler after BugTrap user interface.
+#ifdef _MANAGED
+		NetThunks::FireAfterUnhandledExceptionEvent();
+#endif
 		if (g_pfnPostErrHandler != NULL)
 			(*g_pfnPostErrHandler)(g_nPostErrHandlerParam);
 		// Deallocate system engine object.
@@ -491,8 +504,10 @@ static void DetachProcess(void)
 	CloseHandle(g_hLogRequestComplete);
 	g_hLogRequestComplete = NULL;
 	// In managed world DllMain() is called after object destructors.
+#ifndef _MANAGED
 	// Free global data (to avoid false messages about memory leaks).
 	FreeGlobalData();
+#endif
 	// Delete synchronization objects.
 	DeleteCriticalSection(&g_csConsoleAccess);
 	DeleteCriticalSection(&g_csMutualLogAccess);
@@ -514,9 +529,11 @@ BOOL WINAPI DllMain(HINSTANCE hModule, DWORD fdwReason, PVOID pvReserved)
 	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hModule);
 #if defined _CRTDBG_MAP_ALLOC && defined _DEBUG
+#ifndef _MANAGED
 		// Avoid incorrect and annoying message about memory leaks
 		// in static hash table used by CXmlReader.
 		CXmlReader::InitStdEntities();
+#endif
 		// Watch for memory leaks.
 		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_LEAK_CHECK_DF);
 		_CrtMemCheckpoint(&g_MemState);
@@ -579,8 +596,12 @@ extern "C" BUGTRAP_API LONG CALLBACK BT_CppFilter(PEXCEPTION_POINTERS pException
  */
 extern "C" BUGTRAP_API LONG CALLBACK BT_NetFilter(PEXCEPTION_POINTERS pExceptionPointers)
 {
+#ifdef _MANAGED
+	return GenericFilter(pExceptionPointers, CSymEngine::NET_EXCEPTION);
+#else
 	pExceptionPointers;
 	return 0;
+#endif
 }
 
 /**
@@ -1117,7 +1138,12 @@ extern "C" BUGTRAP_API void CDECL BT_CallCppFilter(void)
 
 extern "C" BUGTRAP_API void CDECL BT_CallNetFilter(void)
 {
-
+#ifdef _MANAGED
+	__try {
+		RaiseException(EXCEPTION_ACCESS_VIOLATION, 0, 0, NULL);
+	} __except(BT_NetFilter(GetExceptionInformation())) {
+	}
+#endif
 }
 
 /**
@@ -1516,7 +1542,14 @@ extern "C" BUGTRAP_API BOOL APIENTRY BT_ReadVersionInfo(HMODULE hModule)
  */
 static inline PFSetUnhandledExceptionFilter GetOriginalSUEF(void)
 {
+#ifdef _MANAGED
+	if (! g_bInDllMain)
+		return g_ModuleImportTable.GetOriginalProcAddress();
+	else
+		return &SetUnhandledExceptionFilter;
+#else
 	return g_ModuleImportTable.GetOriginalProcAddress();
+#endif
 }
 
 /**
@@ -1525,8 +1558,13 @@ static inline PFSetUnhandledExceptionFilter GetOriginalSUEF(void)
  */
 static inline void OverrideSUEF(HMODULE hModule)
 {
+#ifdef _MANAGED
+	if (! g_bInDllMain && (g_dwFlags & BTF_INTERCEPTSUEF))
+		g_ModuleImportTable.Override(hModule);
+#else
 	if (g_dwFlags & BTF_INTERCEPTSUEF)
 		g_ModuleImportTable.Override(hModule);
+#endif
 }
 
 /**
@@ -1535,7 +1573,12 @@ static inline void OverrideSUEF(HMODULE hModule)
  */
 static inline void RestoreSUEF(HMODULE hModule)
 {
+#ifdef _MANAGED
+	if (! g_bInDllMain)
+		g_ModuleImportTable.Restore(hModule);
+#else
 	g_ModuleImportTable.Restore(hModule);
+#endif
 }
 
 /**

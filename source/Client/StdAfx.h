@@ -14,6 +14,10 @@
 
 #pragma once
 
+#ifdef _MANAGED
+ #pragma unmanaged              // Compile all code as unmanaged by default
+#endif
+
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 
 /// Comment out this if you don't want to use VDMDBG at all
@@ -94,17 +98,33 @@ struct _IMAGELIST { }; // unresolved typeref token
 #define countof(array) (sizeof(array) / sizeof((array)[0]))
 
 #if defined _M_IX86
+ #ifdef _MANAGED
+  #ifdef _DEBUG
+   #pragma comment(lib, "zlibMSD.lib")
+  #else
+   #pragma comment(lib, "zlibMS.lib")
+  #endif
+ #else
   #ifdef _DEBUG
    #pragma comment(lib, "zlibSD.lib")
   #else
    #pragma comment(lib, "zlibS.lib")
   #endif
+ #endif
 #elif defined _M_X64
+ #ifdef _MANAGED
+  #ifdef _DEBUG
+   #pragma comment(lib, "zlibMSD-x64.lib")
+  #else
+   #pragma comment(lib, "zlibMS-x64.lib")
+  #endif
+ #else
   #ifdef _DEBUG
    #pragma comment(lib, "zlibSD-x64.lib")
   #else
    #pragma comment(lib, "zlibS-x64.lib")
   #endif
+ #endif
 #else
  #error CPU architecture is not supported.
 #endif

@@ -41,6 +41,25 @@ enum STACK_WIN32_COLUMN_ID
 	CID_WIN32_ENTRY_MODULE
 };
 
+#ifdef _MANAGED
+
+/// Stack trace list column identifiers.
+enum STACK_NET_COLUMN_ID
+{
+	/// Type name.
+	CID_NET_ENTRY_TYPE,
+	/// Method name.
+	CID_NET_ENTRY_METHOD,
+	/// Source file name.
+	CID_NET_ENTRY_FILE,
+	/// Entry line number.
+	CID_NET_ENTRY_LINE,
+	/// Assembly name.
+	CID_NET_ENTRY_ASSEMBLY
+};
+
+#endif
+
 /**
  * @addtogroup BugTrapUI BugTrap Graphical User Interface
  * @{
@@ -140,6 +159,55 @@ static void InitStackTrace(HWND hwnd)
 	lvc.mask = LVCF_TEXT;
 	lvc.pszText = szColumnTitle;
 
+#ifdef _MANAGED
+	if (NetThunks::IsNetException())
+	{
+		LoadString(g_hInstance, IDS_COLUMN_TYPE, szColumnTitle, countof(szColumnTitle));
+		ListView_InsertColumn(hwndStack, CID_NET_ENTRY_TYPE, &lvc);
+
+		LoadString(g_hInstance, IDS_COLUMN_METHOD, szColumnTitle, countof(szColumnTitle));
+		ListView_InsertColumn(hwndStack, CID_NET_ENTRY_METHOD, &lvc);
+
+		LoadString(g_hInstance, IDS_COLUMN_FILE, szColumnTitle, countof(szColumnTitle));
+		ListView_InsertColumn(hwndStack, CID_NET_ENTRY_FILE, &lvc);
+
+		LoadString(g_hInstance, IDS_COLUMN_LINE, szColumnTitle, countof(szColumnTitle));
+		ListView_InsertColumn(hwndStack, CID_NET_ENTRY_LINE, &lvc);
+
+		LoadString(g_hInstance, IDS_COLUMN_ASSEMBLY, szColumnTitle, countof(szColumnTitle));
+		ListView_InsertColumn(hwndStack, CID_NET_ENTRY_ASSEMBLY, &lvc);
+
+		CNetStackTrace::CNetStackTraceEntry Entry;
+		if (g_pSymEngine->GetFirstStackTraceEntry(Entry))
+		{
+			LVITEM lvi;
+			ZeroMemory(&lvi, sizeof(lvi));
+			lvi.mask = LVIF_TEXT;
+			int iItemPos = 0;
+			do
+			{
+				lvi.iItem = iItemPos;
+				lvi.pszText = Entry.m_szType;
+				ListView_InsertItem(hwndStack, &lvi);
+				ListView_SetItemText(hwndStack, iItemPos, CID_NET_ENTRY_METHOD, Entry.m_szMethod);
+				ListView_SetItemText(hwndStack, iItemPos, CID_NET_ENTRY_FILE, Entry.m_szSourceFile);
+				ListView_SetItemText(hwndStack, iItemPos, CID_NET_ENTRY_LINE, Entry.m_szLineInfo);
+				ListView_SetItemText(hwndStack, iItemPos, CID_NET_ENTRY_ASSEMBLY, Entry.m_szAssembly);
+				++iItemPos;
+			}
+			while (g_pSymEngine->GetNextStackTraceEntry(Entry));
+		}
+
+		ListView_SetColumnWidth(hwndStack, CID_NET_ENTRY_TYPE, LVSCW_AUTOSIZE_USEHEADER);
+		ListView_SetColumnWidth(hwndStack, CID_NET_ENTRY_METHOD, LVSCW_AUTOSIZE_USEHEADER);
+		ListView_SetColumnWidth(hwndStack, CID_NET_ENTRY_FILE, LVSCW_AUTOSIZE_USEHEADER);
+		ListView_SetColumnWidth(hwndStack, CID_NET_ENTRY_LINE, LVSCW_AUTOSIZE_USEHEADER);
+		ListView_SetColumnWidth(hwndStack, CID_NET_ENTRY_ASSEMBLY, LVSCW_AUTOSIZE_USEHEADER);
+	}
+	else
+	{
+#endif
+
 		LoadString(g_hInstance, IDS_COLUMN_ADDRESS, szColumnTitle, countof(szColumnTitle));
 		ListView_InsertColumn(hwndStack, CID_WIN32_ENTRY_ADDRESS, &lvc);
 
@@ -181,6 +249,9 @@ static void InitStackTrace(HWND hwnd)
 		ListView_SetColumnWidth(hwndStack, CID_WIN32_ENTRY_FILE, LVSCW_AUTOSIZE_USEHEADER);
 		ListView_SetColumnWidth(hwndStack, CID_WIN32_ENTRY_LINE, LVSCW_AUTOSIZE_USEHEADER);
 		ListView_SetColumnWidth(hwndStack, CID_WIN32_ENTRY_MODULE, LVSCW_AUTOSIZE_USEHEADER);
+#ifdef _MANAGED
+	}
+#endif
 
 }
 

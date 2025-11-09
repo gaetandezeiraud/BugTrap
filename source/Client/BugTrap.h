@@ -17,6 +17,10 @@
 
 #pragma once
 
+#if defined _MANAGED && ! defined _UNICODE
+ #error Managed version of BugTrap requires Unicode character set
+#endif // _MANAGED && ! _UNICODE
+
 /*
  * The following ifdef block is the standard way of creating macros which make exporting
  * from a DLL simpler. All files within this DLL are compiled with the BUGTRAP_EXPORTS
@@ -121,15 +125,23 @@ typedef enum BUGTRAP_FLAGS_tag
 	 * if you want to know which dialogs were shown on the screen.
 	 */
 	BTF_SCREENCAPTURE  = 0x020,
+#ifdef _MANAGED
 	/**
-	 * @brief When enabled, BugTrap injects fake SetUnhandledExceptionFilter()
-	 * to handle the most severe C runtime errors. Usually such errors
-	 * are not being reported to custom unhandled exception filters. This
-	 * flag vanishes any attempts of C runtime library to override
-	 * unhandled exception filter defined in BugTrap. This option should
-	 * be used with caution, because such technique may be incompatible
-	 * with future Windows versions.
+	 * @brief Generate native stack trace and modules information along
+	 * with managed exception information. Disable this option to speedup
+	 * report generation.
 	 */
+	 BTF_NATIVEINFO    = 0x040,
+#endif // _MANAGED
+	 /**
+	  * @brief When enabled, BugTrap injects fake SetUnhandledExceptionFilter()
+	  * to handle the most severe C runtime errors. Usually such errors
+	  * are not being reported to custom unhandled exception filters. This
+	  * flag vanishes any attempts of C runtime library to override
+	  * unhandled exception filter defined in BugTrap. This option should
+	  * be used with caution, because such technique may be incompatible
+	  * with future Windows versions.
+	  */
 	 BTF_INTERCEPTSUEF = 0x080,
 	 /**
 	  * @brief When report is being sent over TCP/HTTP protocol, BugTrap could
@@ -816,6 +828,19 @@ BUGTRAP_API LONG CALLBACK BT_CppFilter(PEXCEPTION_POINTERS pExceptionPointers);
  * @note Don't call this function directly in your code.
  */
 BUGTRAP_API void CDECL BT_CallCppFilter(void);
+
+#ifdef _MANAGED
+/**
+ * @brief Executes .NET exception filter.
+ * @note Don't call this function directly in your code.
+ */
+BUGTRAP_API LONG CALLBACK BT_NetFilter(PEXCEPTION_POINTERS pExceptionPointers);
+/**
+ * @brief Simulates access violation in .NET application. Used by set_terminate().
+ * @note Don't call this function directly in your code.
+ */
+BUGTRAP_API void CDECL BT_CallNetFilter(void);
+#endif // _MANAGED
 
 /**
  * Installs BugTrap handler to be called by the runtime in response to

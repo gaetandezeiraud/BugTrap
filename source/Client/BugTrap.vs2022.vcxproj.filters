@@ -169,7 +169,13 @@
     <ClCompile Include="ModuleImportTable.cpp">
       <Filter>System\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="NetThunks.cpp">
+      <Filter>System\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="SymEngine.cpp">
+      <Filter>System\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SymEngineNet.cpp">
       <Filter>System\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TextLogFile.cpp">
@@ -179,6 +185,9 @@
       <Filter>System\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BugTrap.cpp">
+      <Filter>Main\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrapNet.cpp">
       <Filter>Main\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BugTrapUI.cpp">
@@ -312,7 +321,13 @@
     <ClInclude Include="ModuleImportTable.h">
       <Filter>System\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NetThunks.h">
+      <Filter>System\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="SymEngine.h">
+      <Filter>System\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SymEngineNet.h">
       <Filter>System\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TextLogFile.h">
@@ -328,6 +343,9 @@
       <Filter>Main\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BugTrap.h">
+      <Filter>Main\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrapNet.h">
       <Filter>Main\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BugTrapUI.h">

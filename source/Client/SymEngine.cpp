@@ -109,6 +109,9 @@ CSymEngine::COsInfo::COsInfo(void)
 	m_pszWinVersion = NULL;
 	*m_szSPVersion = _T('\0');
 	*m_szBuildNumber = _T('\0');
+#ifdef _MANAGED
+	*m_szNetVersion = _T('\0');
+#endif
 }
 
 CSymEngine::CMemInfo::CMemInfo(void)
@@ -202,6 +205,9 @@ void CSymEngine::SetEngineParameters(const CEngineParams& rParams)
 	m_pScreenShot = rParams.m_pScreenShot;
 	m_pErrorInfo = rParams.m_pErrorInfo;
 	AdjustExceptionStackFrame();
+#ifdef _MANAGED
+	m_pNetStackTrace = new CNetStackTrace();
+#endif
 }
 
 void CSymEngine::ResetEngineParameters(void)
@@ -213,6 +219,10 @@ void CSymEngine::ResetEngineParameters(void)
 	m_pScreenShot = NULL;
 	m_pErrorInfo = NULL;
 	GetLocalTime(&m_DateTime);
+#ifdef _MANAGED
+	delete m_pNetStackTrace;
+	m_pNetStackTrace = NULL;
+#endif
 }
 
 /**
@@ -235,6 +245,9 @@ CSymEngine::CSymEngine(const CEngineParams& rParams)
 		m_hDbgHelpDll = LoadLibrary(szDbgHelpDll);
 
 	m_hSymProcess = NULL;
+#ifdef _MANAGED
+	m_pNetStackTrace = NULL;
+#endif
 
 	if (m_hDbgHelpDll != NULL)
 	{
@@ -289,6 +302,9 @@ CSymEngine::CSymEngine(const CEngineParams& rParams)
 
 CSymEngine::~CSymEngine(void)
 {
+#ifdef _MANAGED
+	delete m_pNetStackTrace;
+#endif
 	if (m_hSymProcess != NULL)
 		FSymCleanup(m_hSymProcess);
 	if (m_hDbgHelpDll != NULL)
@@ -483,6 +499,14 @@ BOOL CSymEngine::AdjustExceptionStackFrame(void)
 						bFoundThrowingFrame = TRUE;
 					}
 					break;
+#ifdef _MANAGED
+				case NET_EXCEPTION:
+					if (strcmp(pSymbol->Name, "BT_CallNetFilter") == 0)
+					{
+						bFoundThrowingFrame = TRUE;
+					}
+					break;
+#endif
 				case NO_EXCEPTION:
 					if (strcmp(pSymbol->Name, "BT_SaveSnapshot") == 0)
 					{
@@ -702,6 +726,11 @@ BOOL CSymEngine::GetErrorInfo(CErrorInfo& rErrorInfo)
 	case CPP_EXCEPTION:
 		rErrorInfo.m_pszWhat = _T("NATIVE_EXCEPTION");
 		break;
+#ifdef _MANAGED
+	case NET_EXCEPTION:
+		rErrorInfo.m_pszWhat = _T("MANAGED_EXCEPTION");
+		break;
+#endif
 	}
 	GetFirstStackTraceEntry(rErrorInfo);
 	return TRUE;
@@ -767,6 +796,102 @@ BOOL CSymEngine::GetWin32ErrorString(CUTF8EncStream& rEncStream)
 	rEncStream.WriteUTF8Bin(Stream);
 	return bResult;
 }
+
+#ifdef _MANAGED
+
+/**
+ * @param rStream - stream object.
+ * @return true if error info is not empty.
+ */
+BOOL CSymEngine::GetNetErrorString(CStrStream& rStream)
+{
+	if (IsNetException())
+		return m_pNetStackTrace->GetErrorString(rStream);
+	rStream.Free();
+	return FALSE;
+}
+
+/**
+ * @param rEncStream - UTF-8 encoder object.
+ * @return true if error info is not empty.
+ */
+BOOL CSymEngine::GetNetErrorString(CUTF8EncStream& rEncStream)
+{
+	CStrStream Stream(1024);
+	BOOL bResult = GetNetErrorString(Stream);
+	rEncStream.WriteUTF8Bin(Stream);
+	return bResult;
+}
+
+/**
+ * @param rStream - stream object.
+ * @return true if error info is not empty.
+ */
+BOOL CSymEngine::GetNetErrorStringEx(CStrStream& rStream)
+{
+	if (! GetNetErrorString(rStream))
+		return FALSE;
+	gcroot<Exception^> exception = NetThunks::GetNetException();
+	if (! NetThunks::IsNull(exception))
+	{
+		for (DWORD dwNestedErrorLevel = 1; dwNestedErrorLevel < MAX_INNER_ERROR_COUNT; ++dwNestedErrorLevel)
+		{
+			exception = NetThunks::GetInnerException(exception);
+			if (NetThunks::IsNull(exception))
+				break;
+			CNetStackTrace NetStackTrace(exception);
+			CStrStream TempStream(1024);
+			if (! NetStackTrace.GetErrorString(TempStream))
+				break;
+			rStream << _T("\r\n");
+			for (DWORD dwSpaceCounter = 0; dwSpaceCounter < dwNestedErrorLevel; ++dwSpaceCounter)
+				rStream << _T(" ");
+			rStream << TempStream;
+		}
+	}
+
+	return true;
+}
+
+/**
+ * @param rEncStream - UTF-8 encoder object.
+ * @return true if error info is not empty.
+ */
+BOOL CSymEngine::GetNetErrorStringEx(CUTF8EncStream& rEncStream)
+{
+	CStrStream Stream(1024);
+	BOOL bResult = GetNetErrorStringEx(Stream);
+	rEncStream.WriteUTF8Bin(Stream);
+	return bResult;
+}
+
+/**
+ * @param rStream - stream object.
+ * @return true if error info is not empty.
+ */
+BOOL CSymEngine::GetErrorString(CStrStream& rStream)
+{
+	if (IsNetException())
+		return GetNetErrorStringEx(rStream);
+	else if (m_pExceptionPointers != NULL)
+		return GetWin32ErrorString(rStream);
+	else
+		return FALSE;
+}
+
+/**
+ * @param rEncStream - UTF-8 encoder object.
+ * @return true if error info is not empty.
+ */
+BOOL CSymEngine::GetErrorString(CUTF8EncStream& rEncStream)
+{
+	CStrStream Stream(1024);
+	BOOL bResult = GetErrorString(Stream);
+	rEncStream.WriteUTF8Bin(Stream);
+	return bResult;
+}
+
+#endif
 
 /**
  * @param rRegVals - registers values in string format.
@@ -1194,6 +1319,10 @@ void CSymEngine::GetOsInfo(COsInfo& rOsInfo)
 
 	_tcscpy_s(rOsInfo.m_szSPVersion, countof(rOsInfo.m_szSPVersion), osvi.szCSDVersion);
 	_ultot_s(osvi.dwBuildNumber, rOsInfo.m_szBuildNumber, countof(rOsInfo.m_szBuildNumber), 10);
+
+#ifdef _MANAGED
+	NetThunks::GetNetVersion(rOsInfo.m_szNetVersion, countof(rOsInfo.m_szNetVersion));
+#endif
 }
 
 /**
@@ -1204,12 +1333,23 @@ void CSymEngine::GetOsString(PTSTR pszOSString, DWORD dwOSStringSize)
 {
 	COsInfo OsInfo;
 	GetOsInfo(OsInfo);
+#ifdef _MANAGED
+	_stprintf_s(pszOSString, dwOSStringSize,
+	            _T("OS Version:    %s %s\r\n")
+	            _T("Build Number:  %s\r\n")
+				_T("CLR Version:   %s"),
+	            OsInfo.m_pszWinVersion,
+	            OsInfo.m_szSPVersion,
+	            OsInfo.m_szBuildNumber,
+				OsInfo.m_szNetVersion);
+#else
 	_stprintf_s(pszOSString, dwOSStringSize,
 	            _T("OS Version:    %s %s\r\n")
 	            _T("Build Number:  %s"),
 	            OsInfo.m_pszWinVersion,
 	            OsInfo.m_szSPVersion,
 	            OsInfo.m_szBuildNumber);
+#endif
 }
 
 /**
@@ -1558,6 +1698,101 @@ void CSymEngine::GetEnvironmentStrings(CUTF8EncStream& rEncStream)
 	rEncStream.WriteUTF8Bin(Stream);
 }
 
+#ifdef _MANAGED
+
+/**
+ * @param rEncStream - UTF-8 encoder object.
+ */
+void CSymEngine::GetAssemblyList(CUTF8EncStream& rEncStream)
+{
+	static const CHAR szAppDomainMsg[] = "\r\nApplication Domain: ";
+	static const CHAR szAssembliesMsg[] = ", Assemblies:\r\n";
+	static const CHAR szAppDomainIDMsg[] = ", ID: ";
+	static const CHAR szAssemblyNameMsg[] = "Assembly Name: ";
+	static const CHAR szAssemblyVersionMsg[] = "\r\nAssembly Version: ";
+	static const CHAR szFileVersionMsg[] = "\r\nFile Version: ";
+	static const CHAR szCodeBaseMsg[] = "\r\nCode Base: ";
+	static const CHAR szDividerMsg[] = "----------------------------------------\r\n";
+	static const CHAR szNewLine[] = "\r\n";
+
+	DWORD dwAppDomainID;
+	WCHAR szAppDomainName[MAX_PATH];
+	NetThunks::GetAppDomainInfo(dwAppDomainID, szAppDomainName, countof(szAppDomainName));
+	CHAR szAppDomainID[32];
+	_ultoa_s(dwAppDomainID, szAppDomainID, countof(szAppDomainID), 10);
+
+	rEncStream.WriteAscii(szAppDomainMsg);
+	rEncStream.WriteUTF8Bin(szAppDomainName);
+	rEncStream.WriteAscii(szAppDomainIDMsg);
+	rEncStream.WriteAscii(szAppDomainID);
+
+	CNetAssemblies NetAssemblies;
+	CNetAssemblies::CAssemblyInfo AssemblyInfo;
+	if (NetAssemblies.GetFirstAssembly(AssemblyInfo))
+	{
+		rEncStream.WriteAscii(szAssembliesMsg);
+		rEncStream.WriteAscii(szDividerMsg);
+		do
+		{
+			rEncStream.WriteAscii(szAssemblyNameMsg);
+			rEncStream.WriteUTF8Bin(AssemblyInfo.m_szName);
+
+			rEncStream.WriteAscii(szAssemblyVersionMsg);
+			rEncStream.WriteUTF8Bin(AssemblyInfo.m_szVersion);
+
+			rEncStream.WriteAscii(szFileVersionMsg);
+			rEncStream.WriteUTF8Bin(AssemblyInfo.m_szFileVersion);
+
+			rEncStream.WriteAscii(szCodeBaseMsg);
+			rEncStream.WriteUTF8Bin(AssemblyInfo.m_szCodeBase);
+
+			rEncStream.WriteAscii(szNewLine);
+			rEncStream.WriteAscii(szNewLine);
+		}
+		while (NetAssemblies.GetNextAssembly(AssemblyInfo));
+	}
+	else
+		rEncStream.WriteAscii(szNewLine);
+}
+
+/**
+ * @param rXmlWriter - XML writer.
+ */
+void CSymEngine::GetAssemblyList(CXmlWriter& rXmlWriter)
+{
+	DWORD dwAppDomainID;
+	WCHAR szAppDomainName[MAX_PATH];
+	NetThunks::GetAppDomainInfo(dwAppDomainID, szAppDomainName, countof(szAppDomainName));
+	TCHAR szAppDomainID[32];
+	_ultot_s(dwAppDomainID, szAppDomainID, countof(szAppDomainID), 10);
+
+	rXmlWriter.WriteStartElement(_T("app-domain")); // <app-domain>
+	 rXmlWriter.WriteElementString(_T("name"), szAppDomainName); // <name>...</name>
+	 rXmlWriter.WriteElementString(_T("id"), szAppDomainID); // <id>...</id>
+	 rXmlWriter.WriteStartElement(_T("assemblies")); // <assemblies>
+
+	 CNetAssemblies NetAssemblies;
+	 CNetAssemblies::CAssemblyInfo AssemblyInfo;
+	 if (NetAssemblies.GetFirstAssembly(AssemblyInfo))
+	 {
+		 do
+		 {
+			 rXmlWriter.WriteStartElement(_T("assembly")); // <assembly>
+			  rXmlWriter.WriteElementString(_T("name"), AssemblyInfo.m_szName); // <name>...</name>
+			  rXmlWriter.WriteElementString(_T("version"), AssemblyInfo.m_szVersion); // <version>...</version>
+			  rXmlWriter.WriteElementString(_T("file-version"), AssemblyInfo.m_szFileVersion); // <file-version>...</file-version>
+			  rXmlWriter.WriteElementString(_T("code-base"), AssemblyInfo.m_szCodeBase); // <code-base>...</code-base>
+			 rXmlWriter.WriteEndElement(); // </assembly>
+		 }
+		 while (NetAssemblies.GetNextAssembly(AssemblyInfo));
+	 }
+
+	 rXmlWriter.WriteEndElement(); // </assemblies>
+	rXmlWriter.WriteEndElement(); // </app-domain>
+}
+
+#endif
+
 /**
  * @param rEncStream - UTF-8 encoder object.
  * @param pEnumProcess - pointer to the process enumerator;
@@ -1778,6 +2013,97 @@ void CSymEngine::GetWin32StackTrace(CXmlWriter& rXmlWriter, DWORD dwThreadID, HA
 	rXmlWriter.WriteEndElement(); // </thread>
 }
 
+#ifdef _MANAGED
+
+/**
+ * @param rEncStream - UTF-8 encoder object.
+ */
+void CSymEngine::GetNetStackTrace(CUTF8EncStream& rEncStream)
+{
+	_ASSERTE(m_pNetStackTrace != NULL);
+
+	static const CHAR szTraceMsg[] = "\r\nCLR Stack Trace: ";
+	static const CHAR szInterruptedStateMsg[] = "Interrupted Thread";
+	static const CHAR szActiveStateMsg[] = "Active Thread";
+	static const CHAR szThreadIDMsg[] = ", TID: ";
+	static const CHAR szThreadNameMsg[] = ", Name: ";
+	static const CHAR szDividerMsg[] = "----------------------------------------\r\n";
+	static const CHAR szNewLine[] = "\r\n";
+	PCSTR pszThreadStatus = IsNetException() ? szInterruptedStateMsg : szActiveStateMsg;
+
+	DWORD dwThreadID;
+	WCHAR szThreadName[128];
+	NetThunks::GetThreadInfo(dwThreadID, szThreadName, countof(szThreadName));
+	CHAR szThreadID[32];
+	_ultoa_s(dwThreadID, szThreadID, countof(szThreadID), 10);
+
+	rEncStream.WriteAscii(szTraceMsg);
+	rEncStream.WriteAscii(pszThreadStatus);
+	if (*szThreadName)
+	{
+		rEncStream.WriteAscii(szThreadNameMsg);
+		rEncStream.WriteUTF8Bin(szThreadName);
+	}
+	rEncStream.WriteAscii(szThreadIDMsg);
+	rEncStream.WriteAscii(szThreadID);
+	rEncStream.WriteAscii(szNewLine);
+	rEncStream.WriteAscii(szDividerMsg);
+
+	bool bContinue = m_pNetStackTrace->GetFirstStackTraceString(rEncStream);
+	while (bContinue)
+	{
+		rEncStream.WriteAscii(szNewLine);
+		bContinue = m_pNetStackTrace->GetNextStackTraceString(rEncStream);
+	}
+
+	rEncStream.WriteAscii(szNewLine);
+}
+
+/**
+ * @param rXmlWriter - XML writer.
+ */
+void CSymEngine::GetNetStackTrace(CXmlWriter& rXmlWriter)
+{
+	_ASSERTE(m_pNetStackTrace != NULL);
+
+	static const TCHAR szInterruptedState[] = _T("interrupted");
+	static const TCHAR szActiveState[] = _T("active");
+	PCTSTR pszThreadStatus = IsNetException() ? szInterruptedState : szActiveState;
+
+	rXmlWriter.WriteStartElement(_T("clr-thread")); // <clr-thread>
+
+	DWORD dwThreadID;
+	WCHAR szThreadName[128];
+	NetThunks::GetThreadInfo(dwThreadID, szThreadName, countof(szThreadName));
+	 rXmlWriter.WriteElementString(_T("name"), szThreadName); // <name>...</name>
+	 TCHAR szThreadID[32];
+	 _ultot_s(dwThreadID, szThreadID, countof(szThreadID), 10);
+	 rXmlWriter.WriteElementString(_T("id"), szThreadID); // <id>...</id>
+	 rXmlWriter.WriteElementString(_T("status"), pszThreadStatus); // <status>...</status>
+	 rXmlWriter.WriteStartElement(_T("stack")); // <stack>
+
+	  CNetStackTrace::CNetStackTraceEntry Entry;
+	  BOOL bContinue = m_pNetStackTrace->GetFirstStackTraceEntry(Entry);
+	  while (bContinue)
+	  {
+		  rXmlWriter.WriteStartElement(_T("frame")); // <frame>
+		   rXmlWriter.WriteElementString(_T("assembly"), Entry.m_szAssembly); // <assembly>...</assembly>
+		   rXmlWriter.WriteElementString(_T("native-offset"), Entry.m_szNativeOffset); // <native-offset>...</native-offset>
+		   rXmlWriter.WriteElementString(_T("il-offset"), Entry.m_szILOffset); // <il-offset>...</il-offset>
+		   rXmlWriter.WriteElementString(_T("type"), Entry.m_szType); // <type>...</type>
+		   rXmlWriter.WriteElementString(_T("method"), Entry.m_szMethod); // <method>...</method>
+		   rXmlWriter.WriteElementString(_T("file"), Entry.m_szSourceFile); // <file>...</file>
+		   rXmlWriter.WriteElementString(_T("line"), Entry.m_szLineNumber); // <line>...</line>
+		   rXmlWriter.WriteElementString(_T("column"), Entry.m_szColumnNumber); // <column>...</column>
+		  rXmlWriter.WriteEndElement(); // </frame>
+		  bContinue = m_pNetStackTrace->GetNextStackTraceEntry(Entry);
+	  }
+
+	 rXmlWriter.WriteEndElement(); // </stack>
+	rXmlWriter.WriteEndElement(); // </clr-thread>
+}
+
+#endif
 
 /**
  * @param rEncStream - UTF-8 encoder object.
@@ -2049,6 +2375,10 @@ void CSymEngine::GetErrorLog(CUTF8EncStream& rEncStream, CEnumProcess* pEnumProc
 	static const CHAR szMemMsg[] = "\r\n\r\nMemory Usage:\r\n";
 	static const CHAR szNewLine[] = "\r\n";
 
+#ifdef _MANAGED
+	bool bNativeInfo = m_pNetStackTrace == NULL || (g_dwFlags & BTF_NATIVEINFO) != 0;
+#endif
+
 	if (*g_szAppName)
 	{
 		rEncStream.WriteAscii(szAppMsg);
@@ -2101,6 +2431,9 @@ void CSymEngine::GetErrorLog(CUTF8EncStream& rEncStream, CEnumProcess* pEnumProc
 	rEncStream.WriteUTF8Bin(szDateTime);
 
 	if (
+#ifdef _MANAGED
+		IsNetException() ||
+#endif
 		m_pExceptionPointers != NULL)
 	{
 		rEncStream.WriteAscii(szErrorMsg);
@@ -2136,6 +2469,9 @@ void CSymEngine::GetErrorLog(CUTF8EncStream& rEncStream, CEnumProcess* pEnumProc
 	}
 
 	if (m_pExceptionPointers != NULL
+#ifdef _MANAGED
+		&& bNativeInfo
+#endif
 		)
 	{
 		rEncStream.WriteAscii(szRegistersMsg);
@@ -2157,6 +2493,16 @@ void CSymEngine::GetErrorLog(CUTF8EncStream& rEncStream, CEnumProcess* pEnumProc
 
 	rEncStream.WriteAscii(szNewLine);
 
+#ifdef _MANAGED
+	if (m_pNetStackTrace != NULL)
+	{
+		GetNetStackTrace(rEncStream);
+		GetNetThreadsList(rEncStream);
+	}
+
+	if (bNativeInfo)
+	{
+#endif
 		if (m_pExceptionPointers != NULL)
 		{
 			DWORD dwCurrentThreadID = GetCurrentThreadId();
@@ -2164,6 +2510,9 @@ void CSymEngine::GetErrorLog(CUTF8EncStream& rEncStream, CEnumProcess* pEnumProc
 		}
 		if (pEnumProcess != NULL)
 			GetWin32ThreadsList(rEncStream, pEnumProcess);
+#ifdef _MANAGED
+	}
+#endif
 
 	PCTSTR pszCommandLine = GetCommandLine();
 	_ASSERTE(pszCommandLine != NULL);
@@ -2183,9 +2532,79 @@ void CSymEngine::GetErrorLog(CUTF8EncStream& rEncStream, CEnumProcess* pEnumProc
 	rEncStream.WriteAscii(szDividerMsg);
 	GetEnvironmentStrings(rEncStream);
 
+#ifdef _MANAGED
+	GetAssemblyList(rEncStream);
+	if (bNativeInfo)
+	{
+#endif
 		if (pEnumProcess != NULL)
 			GetProcessList(rEncStream, pEnumProcess);
+#ifdef _MANAGED
+	}
+#endif
 }
+
+#ifdef _MANAGED
+
+/**
+ * @param rXmlWriter - XML writer object.
+ * @param pNetStackTrace - current stack trace.
+ * @param exception - managed exception object.
+ * @param dwNestedErrorLevel - nested error level.
+ * @return true if error information is not empty.
+ */
+BOOL CSymEngine::GetErrorInfo(CXmlWriter& rXmlWriter, CNetStackTrace* pNetStackTrace, gcroot<Exception^> exception, DWORD dwNestedErrorLevel)
+{
+	if (dwNestedErrorLevel >= MAX_INNER_ERROR_COUNT)
+		return FALSE;
+
+	_ASSERTE(pNetStackTrace != NULL);
+	CNetStackTrace::CNetErrorInfo ErrorInfo;
+	if (! pNetStackTrace->GetErrorInfo(ErrorInfo))
+		return FALSE;
+
+	if (dwNestedErrorLevel == 0)
+		rXmlWriter.WriteElementString(_T("what"), _T("MANAGED_EXCEPTION")); // <what>...</what>
+	rXmlWriter.WriteStartElement(_T("exception")); // <exception>
+	 rXmlWriter.WriteElementString(_T("type"), ErrorInfo.m_szException); // <type>...</type>
+	 rXmlWriter.WriteElementString(_T("message"), ErrorInfo.m_szMessage); // <message>...</message>
+	rXmlWriter.WriteEndElement(); // </exception>
+	if (dwNestedErrorLevel == 0)
+	{
+		rXmlWriter.WriteStartElement(_T("process")); // <process>
+		 rXmlWriter.WriteElementString(_T("name"), ErrorInfo.m_szProcessName); // <name>...</name>
+		 rXmlWriter.WriteElementString(_T("id"), ErrorInfo.m_szProcessID); // <id>...</id>
+		rXmlWriter.WriteEndElement(); // </process>
+		rXmlWriter.WriteStartElement(_T("app-domain")); // <app-domain>
+		 rXmlWriter.WriteElementString(_T("name"), ErrorInfo.m_szAppDomainName); // <name>...</name>
+		 rXmlWriter.WriteElementString(_T("id"), ErrorInfo.m_szAppDomainID); // <id>...</id>
+		rXmlWriter.WriteEndElement(); // </app-domain>
+	}
+	rXmlWriter.WriteElementString(_T("assembly"), ErrorInfo.m_szAssembly); // <assembly>...</assembly>
+	rXmlWriter.WriteElementString(_T("native-offset"), ErrorInfo.m_szNativeOffset); // <native-offset>...</native-offset>
+	rXmlWriter.WriteElementString(_T("il-offset"), ErrorInfo.m_szILOffset); // <il-offset>...</il-offset>
+	rXmlWriter.WriteElementString(_T("type"), ErrorInfo.m_szType); // <type>...</type>
+	rXmlWriter.WriteElementString(_T("method"), ErrorInfo.m_szMethod); // <method>...</method>
+	rXmlWriter.WriteElementString(_T("file"), ErrorInfo.m_szSourceFile); // <file>...</file>
+	rXmlWriter.WriteElementString(_T("line"), ErrorInfo.m_szLineNumber); // <line>...</line>
+	rXmlWriter.WriteElementString(_T("column"), ErrorInfo.m_szColumnNumber); // <column>...</column>
+
+	if (! NetThunks::IsNull(exception))
+	{
+		exception = NetThunks::GetInnerException(exception);
+		if (! NetThunks::IsNull(exception))
+		{
+			rXmlWriter.WriteStartElement(_T("inner-error")); // <inner-error>
+			CNetStackTrace NetStackTrace(exception);
+			GetErrorInfo(rXmlWriter, &NetStackTrace, exception, dwNestedErrorLevel + 1);
+			rXmlWriter.WriteEndElement(); // </inner-error>
+		}
+	}
+
+	return TRUE;
+}
+
+#endif
 
 
 /**
@@ -2194,6 +2613,17 @@ void CSymEngine::GetErrorLog(CUTF8EncStream& rEncStream, CEnumProcess* pEnumProc
  */
 BOOL CSymEngine::GetErrorInfo(CXmlWriter& rXmlWriter)
 {
+#ifdef _MANAGED
+	if (IsNetException())
+	{
+		rXmlWriter.WriteStartElement(_T("error")); // <error>
+		BOOL bResult = GetErrorInfo(rXmlWriter, m_pNetStackTrace, NetThunks::GetNetException(), 0);
+		rXmlWriter.WriteEndElement(); // </error>
+		return bResult;
+	}
+	else if (m_pExceptionPointers != NULL)
+	{
+#endif
 		CErrorInfo ErrorInfo;
 		if (! GetErrorInfo(ErrorInfo))
 			return FALSE;
@@ -2216,6 +2646,10 @@ BOOL CSymEngine::GetErrorInfo(CXmlWriter& rXmlWriter)
 		 rXmlWriter.WriteEndElement(); // </line>
 		rXmlWriter.WriteEndElement(); // </error>
 		return TRUE;
+#ifdef _MANAGED
+	}
+	return FALSE;
+#endif
 }
 
 /**
@@ -2334,6 +2768,9 @@ void CSymEngine::GetOsInfo(CXmlWriter& rXmlWriter)
 	 rXmlWriter.WriteElementString(_T("version"), OsInfo.m_pszWinVersion); // <version>...</version>
 	 rXmlWriter.WriteElementString(_T("spack"), OsInfo.m_szSPVersion); // <spack>...</spack>
 	 rXmlWriter.WriteElementString(_T("build"), OsInfo.m_szBuildNumber); // <build>...</build>
+#ifdef _MANAGED
+	 rXmlWriter.WriteElementString(_T("clr-version"), OsInfo.m_szNetVersion); // <clr-version>...</clr-version>
+#endif
 	rXmlWriter.WriteEndElement(); // </os>
 }
 
@@ -2361,6 +2798,10 @@ void CSymEngine::GetMemInfo(CXmlWriter& rXmlWriter)
 void CSymEngine::GetErrorLog(CXmlWriter& rXmlWriter, CEnumProcess* pEnumProcess)
 {
 	static const TCHAR szInterruptedState[] = _T("interrupted");
+
+#ifdef _MANAGED
+	bool bNativeInfo = m_pNetStackTrace == NULL || (g_dwFlags & BTF_NATIVEINFO) != 0;
+#endif
 
 	rXmlWriter.SetIndentation(_T(' '), 2);
 	rXmlWriter.WriteStartDocument();
@@ -2404,6 +2845,9 @@ void CSymEngine::GetErrorLog(CXmlWriter& rXmlWriter, CEnumProcess* pEnumProcess)
 	  GetSysErrorInfo(rXmlWriter);
 	  GetComErrorInfo(rXmlWriter);
 	  if (m_pExceptionPointers != NULL
+#ifdef _MANAGED
+		&& bNativeInfo
+#endif
 		)
 	  {
 		  GetRegistersInfo(rXmlWriter);
@@ -2412,6 +2856,18 @@ void CSymEngine::GetErrorLog(CXmlWriter& rXmlWriter, CEnumProcess* pEnumProcess)
 	  GetOsInfo(rXmlWriter);
 	  GetMemInfo(rXmlWriter);
 
+#ifdef _MANAGED
+	  if (m_pNetStackTrace != NULL)
+	  {
+		  rXmlWriter.WriteStartElement(_T("clr-threads")); // <clr-threads>
+		   GetNetStackTrace(rXmlWriter);
+		   GetNetThreadsList(rXmlWriter);
+		  rXmlWriter.WriteEndElement(); // </clr-threads>
+	  }
+
+	  if (bNativeInfo)
+	  {
+#endif
 		  rXmlWriter.WriteStartElement(_T("threads")); // <threads>
 		   if (m_pExceptionPointers != NULL)
 		   {
@@ -2421,6 +2877,9 @@ void CSymEngine::GetErrorLog(CXmlWriter& rXmlWriter, CEnumProcess* pEnumProcess)
 		   if (pEnumProcess != NULL)
 			   GetWin32ThreadsList(rXmlWriter, pEnumProcess);
 		  rXmlWriter.WriteEndElement(); // </threads>
+#ifdef _MANAGED
+	  }
+#endif
 
 	  PCTSTR pszCommandLine = GetCommandLine();
 	  _ASSERTE(pszCommandLine != NULL);
@@ -2432,8 +2891,16 @@ void CSymEngine::GetErrorLog(CXmlWriter& rXmlWriter, CEnumProcess* pEnumProcess)
 	  rXmlWriter.WriteElementString(_T("curdir"), szCurrentDirectory); // <curdir>...</curdir>
 	  GetEnvironmentStrings(rXmlWriter);
 
+#ifdef _MANAGED
+	  GetAssemblyList(rXmlWriter);
+	  if (bNativeInfo)
+	  {
+#endif
 		  if (pEnumProcess != NULL)
 			  GetProcessList(rXmlWriter, pEnumProcess);
+#ifdef _MANAGED
+	  }
+#endif
 
 	 rXmlWriter.WriteEndElement(); // </report>
 	rXmlWriter.WriteEndDocument();

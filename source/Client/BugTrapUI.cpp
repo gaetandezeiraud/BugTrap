@@ -26,6 +26,10 @@
 #include "MemStream.h"
 #include "VersionInfoString.h"
 
+#ifdef _MANAGED
+#include "NetThunks.h"
+#endif
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -1203,8 +1207,12 @@ static void ExecuteHandlerAction(void)
 			}
 			break;
 		case BTA_CUSTOM:
+#ifdef _MANAGED
+            NetThunks::FireCustomActivityEvent(g_szInternalReportFilePath);
+#else
             if (g_pfnCustomActivityHandler != NULL)
                 (*g_pfnCustomActivityHandler)(g_szInternalReportFilePath, g_nCustomActivityHandlerParam);
+#endif // _MANAGED
 
 			break;
 		}
