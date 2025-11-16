@@ -57,7 +57,7 @@ jobs:
           mkdir package\bin
           mkdir package\include
 
-          copy source\include\BugTrap.h package\include\
+          copy source\Client\BugTrap.h package\include\
 
           # Copy any DLL or LIB produced under bin folders
           Get-ChildItem -Recurse -Path source -Filter *.dll | Copy-Item -Destination package\bin -Force
