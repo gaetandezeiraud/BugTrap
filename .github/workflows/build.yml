@@ -63,9 +63,9 @@ jobs:
           copy source\Client\BugTrap.h package\include\
 
           # Copy any DLL or LIB produced under bin folders
-          Get-ChildItem -Recurse -Path source -Filter *.dll | Copy-Item -Destination package\bin -Force
-          Get-ChildItem -Recurse -Path source -Filter *.lib | Copy-Item -Destination package\bin -Force
-          Get-ChildItem -Recurse -Path source -Filter *.pdb | Copy-Item -Destination package\bin -Force
+          Get-ChildItem -Recurse -Path bin -Filter *.dll | Copy-Item -Destination package\bin -Force
+          Get-ChildItem -Recurse -Path bin -Filter *.lib | Copy-Item -Destination package\bin -Force
+          Get-ChildItem -Recurse -Path bin -Filter *.pdb | Copy-Item -Destination package\bin -Force
 
       - name: Create zip archive
         run: |
