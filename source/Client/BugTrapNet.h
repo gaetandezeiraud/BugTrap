@@ -46,7 +46,6 @@ namespace IntelleSoft
 		{
 			ShowUI     = BTA_SHOWUI,
 			SaveReport = BTA_SAVEREPORT,
-			MailReport = BTA_MAILREPORT,
 			SendReport = BTA_SENDREPORT,
             Custom = BTA_CUSTOM
 		};
@@ -56,7 +55,6 @@ namespace IntelleSoft
 		{
 			None           = BTF_NONE,
 			DetailedMode   = BTF_DETAILEDMODE,
-			EditMail       = BTF_EDITMAIL,
 			AttachReport   = BTF_ATTACHREPORT,
 			ListProcesses  = BTF_LISTPROCESSES,
 			ShowAdvancedUI = BTF_SHOWADVANCEDUI,
@@ -468,12 +466,6 @@ namespace IntelleSoft
 				void set(String^ value);
 			}
 
-			static property String^ SupportEMail
-			{
-				String^ get(void);
-				void set(String^ value);
-			}
-
 			static property String^ SupportHost
 			{
 				String^ get(void);
@@ -484,12 +476,6 @@ namespace IntelleSoft
 			{
 				short get(void);
 				void set(short value);
-			}
-
-			static property String^ NotificationEMail
-			{
-				String^ get(void);
-				void set(String^ value);
 			}
 
 			static property FlagsType Flags
@@ -528,19 +514,11 @@ namespace IntelleSoft
 				void set(String^ value);
 			}
 
-			static property String^ MailProfile
-			{
-				String^ get(void);
-			}
-
-			static void SetMailProfile(String^ profile, String^ password);
 			static void ExportRegKey(String^ fileName, String^ key);
 			static void SaveSnapshot(String^ fileName);
 			static void SaveSnapshot(System::Exception^ exception, String^ fileName);
 			static void SendSnapshot(void);
 			static void SendSnapshot(System::Exception^ exception);
-			static void MailSnapshot(void);
-			static void MailSnapshot(System::Exception^ exception);
 			static void InstallHandler(void);
 			static void UninstallHandler(void);
 			static void HandleException(System::Exception^ exception);
@@ -695,17 +673,6 @@ namespace IntelleSoft
 			BT_SetSupportURL(wstrURL);
 		}
 
-		inline String^ ExceptionHandler::SupportEMail::get(void)
-		{
-			return gcnew String(BT_GetSupportEMail());
-		}
-
-		inline void ExceptionHandler::SupportEMail::set(String^ value)
-		{
-			pin_ptr<const wchar_t> wstrEMail(PtrToStringChars(value));
-			BT_SetSupportEMail(wstrEMail);
-		}
-
 		inline String^ ExceptionHandler::SupportHost::get(void)
 		{
 			return gcnew String(BT_GetSupportHost());
@@ -725,17 +692,6 @@ namespace IntelleSoft
 		inline void ExceptionHandler::SupportPort::set(short value)
 		{
 			BT_SetSupportPort(value);
-		}
-
-		inline String^ ExceptionHandler::NotificationEMail::get(void)
-		{
-			return gcnew String(BT_GetNotificationEMail());
-		}
-
-		inline void ExceptionHandler::NotificationEMail::set(String^ value)
-		{
-			pin_ptr<const wchar_t> wstrEMail(PtrToStringChars(value));
-			BT_SetNotificationEMail(wstrEMail);
 		}
 
 		inline FlagsType ExceptionHandler::Flags::get(void)
@@ -800,18 +756,6 @@ namespace IntelleSoft
 			BT_SetReportFilePath(wstrPath);
 		}
 
-		inline String^ ExceptionHandler::MailProfile::get(void)
-		{
-			return gcnew String(BT_GetMailProfile());
-		}
-
-		inline void ExceptionHandler::SetMailProfile(String^ profile, String^ password)
-		{
-			pin_ptr<const wchar_t> wstrProfile(PtrToStringChars(profile));
-			pin_ptr<const wchar_t> wstrPassword(PtrToStringChars(password));
-			BT_SetMailProfile(wstrProfile, wstrPassword);
-		}
-
 		inline void ExceptionHandler::ExportRegKey(String^ fileName, String^ key)
 		{
 			pin_ptr<const wchar_t> wstrFileName(PtrToStringChars(fileName));
@@ -829,11 +773,6 @@ namespace IntelleSoft
 		inline void ExceptionHandler::SendSnapshot(void)
 		{
 			ValidateIoResult(BT_SendSnapshot());
-		}
-
-		inline void ExceptionHandler::MailSnapshot(void)
-		{
-			ValidateIoResult(BT_MailSnapshot());
 		}
 
 		inline void ExceptionHandler::ValidateIoResult(BOOL bResult)

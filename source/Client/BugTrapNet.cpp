@@ -144,19 +144,6 @@ namespace IntelleSoft
 			}
 		}
 
-		void ExceptionHandler::MailSnapshot(System::Exception^ exception)
-		{
-			try
-			{
-				Exception = exception;
-				MailSnapshot();
-			}
-			finally
-			{
-				Exception = nullptr;
-			}
-		}
-
 		void LogFile::PrvOpen(String^ fileName, LogFormatType logFormat)
 		{
 			pin_ptr<const wchar_t> wstrFileName(PtrToStringChars(fileName));
