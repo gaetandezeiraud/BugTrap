@@ -1,0 +1,80 @@
+name: Build BugTrap (All Configurations)
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup VS Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1
+
+      #
+      # Build all configurations detected in the solution
+      #
+      - name: Build all configurations
+        run: |
+          $configs = @(
+            ".NET Debug|Win32",
+            ".NET Debug|x64",
+            ".NET Release|Win32",
+            ".NET Release|x64",
+            "Debug|Win32",
+            "Debug|x64",
+            "Release|Win32",
+            "Release|x64",
+            "Unicode Debug|Win32",
+            "Unicode Debug|x64",
+            "Unicode Release|Win32",
+            "Unicode Release|x64"
+          )
+
+          foreach ($cfg in $configs) {
+            $parts = $cfg.Split("|")
+            $conf = $parts[0]
+            $plat = $parts[1]
+
+            echo "=== Building $conf ($plat) ==="
+            msbuild source/BugTrap.vs2022.sln /p:Configuration="$conf" /p:Platform="$plat" /m
+          }
+
+      #
+      # Package DLLs, LIBs, headers
+      #
+      - name: Collect artifacts
+        run: |
+          mkdir package
+          mkdir package\bin
+          mkdir package\include
+
+          copy source\include\BugTrap.h package\include\
+
+          # Copy any DLL or LIB produced under bin folders
+          Get-ChildItem -Recurse -Path source -Filter *.dll | Copy-Item -Destination package\bin -Force
+          Get-ChildItem -Recurse -Path source -Filter *.lib | Copy-Item -Destination package\bin -Force
+          Get-ChildItem -Recurse -Path source -Filter *.pdb | Copy-Item -Destination package\bin -Force
+
+      - name: Create zip archive
+        run: |
+          $zipName = "BugTrap-${{ github.ref_name }}.zip"
+          powershell Compress-Archive -Path package -DestinationPath $zipName
+
+      #
+      # Publish Release with built binaries
+      #
+      - name: Upload Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: BugTrap-${{ github.ref_name }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
