@@ -4,10 +4,6 @@ VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BugTrapConsoleTest", "Examples\BugTrapConsoleTest\BugTrapConsoleTest.vs2022.vcxproj", "{6CB4122E-E337-4514-96E7-E60D2487BA5F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BugTrapLogTest", "Examples\BugTrapLogTest\BugTrapLogTest.vs2022.vcxproj", "{5A802CAA-D386-4678-9D57-4C6DAAF25E2D}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BugTrapManCppTest", "Examples\BugTrapManCppTest\BugTrapManCppTest.vs2022.vcxproj", "{3C5FAB69-6811-4E83-890B-AD9E1DA64881}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BugTrapNetTest.vs2022", "Examples\BugTrapNetTest\BugTrapNetTest.vs2022.csproj", "{2865A152-A874-4A04-80BD-C7BA15CB023C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BugTrap", "Client\BugTrap.vs2022.vcxproj", "{E8CF1ADA-264A-4127-86C2-FD7057D3792C}"
