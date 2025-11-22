@@ -18,29 +18,15 @@
 #include <BugTrap.h>
 
 // Link with one of BugTrap libraries.
-#if defined _M_IX86
- #ifdef _UNICODE
-  #pragma comment(lib, "BugTrapU.lib")
- #else
-  #pragma comment(lib, "BugTrap.lib")
- #endif
-#elif defined _M_X64
- #ifdef _UNICODE
-  #pragma comment(lib, "BugTrapU-x64.lib")
- #else
-  #pragma comment(lib, "BugTrap-x64.lib")
- #endif
+#ifdef _UNICODE
+#pragma comment(lib, "BugTrapU.lib")
 #else
- #error CPU architecture is not supported.
+#pragma comment(lib, "BugTrap.lib")
 #endif
 
 // Enable Common Controls support
 
-#if defined _M_IX86
- #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
-#elif defined _M_IA64
- #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='ia64' publicKeyToken='6595b64144ccf1df' language='*'\"")
-#elif defined _M_X64
+#if defined _M_X64
  #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #else
  #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")

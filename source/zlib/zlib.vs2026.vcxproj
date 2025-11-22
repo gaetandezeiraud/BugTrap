@@ -80,16 +80,16 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='MD Release|x64'">$(ProjectDir)..\..\intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>$(ProjectName)S-x64</TargetName>
+    <TargetName>$(ProjectName)S</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MD Release|x64'">
-    <TargetName>$(ProjectName)MS-x64</TargetName>
+    <TargetName>$(ProjectName)MS</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>$(ProjectName)SD-x64</TargetName>
+    <TargetName>$(ProjectName)SD</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MD Debug|x64'">
-    <TargetName>$(ProjectName)MSD-x64</TargetName>
+    <TargetName>$(ProjectName)MSD</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
@@ -196,7 +196,6 @@
     <ClCompile Include="src\compress.c" />
     <ClCompile Include="src\crc32.c" />
     <ClCompile Include="src\deflate.c" />
-    <ClCompile Include="src\gzio.c" />
     <ClCompile Include="src\infback.c" />
     <ClCompile Include="src\inffast.c" />
     <ClCompile Include="src\inflate.c" />

@@ -13,9 +13,6 @@
     <ClCompile Include="src\deflate.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gzio.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\infback.c">
       <Filter>Source Files</Filter>
     </ClCompile>

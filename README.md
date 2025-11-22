@@ -26,17 +26,15 @@ The BugTrap source code and binaries in this repository are granted by the origi
 
 ## Download & Install
 
-* `BugTrap[U][D][N][-x64].dll` - BugTrap DLL module.
-* `BugTrap[U][D][N][-x64].lib` - BugTrap library file used by linker.
+* `BugTrap[U][D][N].dll` - BugTrap DLL module.
+* `BugTrap[U][D][N].lib` - BugTrap library file used by linker.
   * **`[U]`** - Unicode aware version has 'U' letter. ANSI version doesn't have 'U' letter.
   * **`[D]`** - Debug version has 'D' letter. Release version doesn't have 'D' letter.
   * **`[N]`** - managed (.NET) version has 'N' letter. Native version doesn't have 'N' letter.
-  * **`[-x64]`** - 64 bit version for AMD-64 platform has '-x64' suffix. x86 version doesn't have this suffix.
 * `dbghelp.dll` - DbgHelp library (see ["BugTrap Developer's Guide"](https://raw.githubusercontent.com/Brouilles/BugTrap/master/doc/BugTrap.pdf)                                      for details).
 * `BugTrap.h` - Header file with BugTrap API definitions.
 * `BTTrace.h` - C++ wrapper of custom logging functions.
 * `BTAtlWindow.h` - ATL/WTL exception handlers.
-* `CrashExplorer.exe` - MAP file analyzer.
 
 Please see ["BugTrap Developer's Guide"](https://raw.githubusercontent.com/Brouilles/BugTrap/master/doc/BugTrap.pdf) for additional information about file types used by BugTrap for Win32/x64.
 
