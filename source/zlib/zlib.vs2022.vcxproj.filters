@@ -23,9 +23,6 @@
     <ClCompile Include="src\deflate.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gzio.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\infback.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -60,6 +57,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\zutil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gzclose.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gzlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gzread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gzwrite.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -118,6 +127,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\zutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gzguts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
