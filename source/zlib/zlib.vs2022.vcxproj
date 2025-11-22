@@ -357,7 +357,6 @@
     <ClCompile Include="src\compress.c" />
     <ClCompile Include="src\crc32.c" />
     <ClCompile Include="src\deflate.c" />
-    <ClCompile Include="src\gzio.c" />
     <ClCompile Include="src\infback.c" />
     <ClCompile Include="src\inffast.c" />
     <ClCompile Include="src\inflate.c" />

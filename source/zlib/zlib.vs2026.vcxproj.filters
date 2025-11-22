@@ -1,16 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{65497ab6-3130-4bde-9872-7b336a58dd99}</UniqueIdentifier>
-      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{effe3ca6-389c-4a2f-8cc5-695442afa9f3}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="src\adler32.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -21,6 +11,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\deflate.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gzio.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\infback.c">
@@ -59,11 +52,6 @@
     <ClCompile Include="src\zutil.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="zlib.def">
-      <Filter>Source Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\crc32.h">
@@ -117,5 +105,18 @@
     <ClInclude Include="include\zutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{3c036705-df98-4009-b576-04e5ae05bac3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{ca878988-7009-4e6b-b1a3-e80464ce5457}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="zlib.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
