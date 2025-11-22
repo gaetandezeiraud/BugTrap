@@ -8,13 +8,14 @@ INT_PTR g_iLogHandle = -1;
 static void SetupExceptionHandler()
 {
 	// Setup exception handler
-	BT_SetAppName(_T("BugTrap Test"));
+	BT_SetAppName(_T("38f7fbf1-dde7-4f9f-8caf-98354e19780a"));
+	BT_SetAppVersion(_T("1.0.0"));
 	BT_SetSupportEMail(_T("your@email.com"));
 	BT_SetSupportURL(_T("https://github.com/Brouilles/BugTrap"));
 	BT_SetFlags(BTF_DETAILEDMODE | BTF_ATTACHREPORT);
 
 	// = BugTrapServer ===========================================
-	BT_SetSupportServer(_T("127.0.0.1"), 9999);
+	BT_SetSupportServer(_T("https://localhost:53297/api/RequestHandler"), 53297);
 
 	BT_InstallSehFilter();
 

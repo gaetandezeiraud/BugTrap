@@ -8,13 +8,12 @@
 This project is a fork of https://github.com/bchavez/BugTrap. With a different philosophy, **break things**, **remove deprecated stuff** and have a **light version that does the bare minimum** (generate and sending crash report to remote server or in a local folder).
 
 ## Changelog:    
-* Add support for VS2019 & VS2022
+* Add support for VS2022 & 2026 (VS2026 recommanded)
+* Add support for https server
 * Remove BugTrap Server Application (deprecated)
 * Remove MFC support
 * Remove German translation
 * Remove `WaitDlg` (doesn't seems very revelant to the today hardware standard, just a visual "flash"), `AnimProgressBar` and `ThemeXP`
-* Support only Visual Studio 2019 and 2022 (VS2022 recommanded)
-* Support https server
 * Remove "Mail to" feature
 * Remove CrashExplorer (supposed to be replaced by a web interface)
 * Remove `AboutDlg`

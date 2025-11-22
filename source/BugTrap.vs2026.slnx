@@ -1,0 +1,26 @@
+<Solution>
+  <Configurations>
+    <BuildType Name=".NET Debug" />
+    <BuildType Name=".NET Release" />
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <BuildType Name="Unicode Debug" />
+    <BuildType Name="Unicode Release" />
+    <Platform Name="Win32" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/.nuget/">
+    <File Path=".nuget/NuGet.Config" />
+    <File Path=".nuget/NuGet.exe" />
+    <File Path=".nuget/NuGet.targets" />
+  </Folder>
+  <Project Path="Client/BugTrap.vs2026.vcxproj" Id="e8cf1ada-264a-4127-86c2-fd7057d3792c">
+    <BuildDependency Project="zlib/zlib.vs2026.vcxproj" />
+  </Project>
+  <Project Path="zlib/zlib.vs2026.vcxproj" Id="b5919129-6716-499d-9516-04ec34c86cdf">
+    <BuildType Solution=".NET Debug|*" Project="MD Debug" />
+    <BuildType Solution=".NET Release|*" Project="MD Release" />
+    <BuildType Solution="Unicode Debug|*" Project="Debug" />
+    <BuildType Solution="Unicode Release|*" Project="Release" />
+  </Project>
+</Solution>

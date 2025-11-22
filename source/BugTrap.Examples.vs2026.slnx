@@ -1,0 +1,50 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <BuildType Name="Unicode Debug" />
+    <BuildType Name="Unicode Release" />
+    <Platform Name=".NET x86" />
+    <Platform Name="Win32" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Examples/">
+    <Project Path="Examples/BugTrapConsoleTest/BugTrapConsoleTest.vs2026.vcxproj" Id="6cb4122e-e337-4514-96e7-e60d2487ba5f">
+      <BuildType Solution="Unicode Debug|.NET x86" Project="Debug" />
+      <BuildType Solution="Unicode Release|.NET x86" Project="Release" />
+      <Platform Solution="*|.NET x86" Project="Win32" />
+      <Build Solution="*|.NET x86" Project="false" />
+    </Project>
+  </Folder>
+  <Project Path="Client/BugTrap.vs2026.vcxproj" Id="e8cf1ada-264a-4127-86c2-fd7057d3792c">
+    <BuildDependency Project="zlib/zlib.vs2026.vcxproj" />
+    <BuildType Solution="Debug|.NET x86" Project=".NET Debug" />
+    <BuildType Solution="Release|.NET x86" Project=".NET Release" />
+    <BuildType Solution="Unicode Debug|.NET x86" Project=".NET Debug" />
+    <BuildType Solution="Unicode Release|.NET x86" Project=".NET Release" />
+    <Platform Solution="*|.NET x86" Project="Win32" />
+    <Build Solution="Unicode Debug|.NET x86" Project="false" />
+    <Build Solution="Unicode Release|.NET x86" Project="false" />
+  </Project>
+  <Project Path="Examples/BugTrapNetTest/BugTrapNetTest.vs2026.csproj" Id="2865a152-a874-4a04-80bd-c7ba15cb023c">
+    <BuildType Solution="Unicode Debug|*" Project="Debug" />
+    <BuildType Solution="Unicode Release|*" Project="Release" />
+    <Platform Project="x86" />
+    <Build Solution="*|x64" Project="false" />
+    <Build Solution="Unicode Debug|.NET x86" Project="false" />
+    <Build Solution="Unicode Release|.NET x86" Project="false" />
+  </Project>
+  <Project Path="zlib/zlib.vs2026.vcxproj" Id="b5919129-6716-499d-9516-04ec34c86cdf">
+    <BuildType Solution="Debug|.NET x86" Project="MD Debug" />
+    <BuildType Solution="Release|.NET x86" Project="MD Release" />
+    <BuildType Solution="Unicode Debug|.NET x86" Project="MD Debug" />
+    <BuildType Solution="Unicode Debug|Win32" Project="Debug" />
+    <BuildType Solution="Unicode Debug|x64" Project="Debug" />
+    <BuildType Solution="Unicode Release|.NET x86" Project="MD Release" />
+    <BuildType Solution="Unicode Release|Win32" Project="Release" />
+    <BuildType Solution="Unicode Release|x64" Project="Release" />
+    <Platform Solution="*|.NET x86" Project="Win32" />
+    <Build Solution="Unicode Debug|.NET x86" Project="false" />
+    <Build Solution="Unicode Release|.NET x86" Project="false" />
+  </Project>
+</Solution>
