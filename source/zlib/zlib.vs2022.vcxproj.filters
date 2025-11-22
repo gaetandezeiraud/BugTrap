@@ -59,18 +59,6 @@
     <ClCompile Include="src\zutil.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gzclose.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\gzlib.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\gzread.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\gzwrite.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="zlib.def">
@@ -127,9 +115,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\zutil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\gzguts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
