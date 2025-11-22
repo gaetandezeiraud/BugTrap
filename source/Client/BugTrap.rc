@@ -103,8 +103,8 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "",IDC_INTRO_BKGND,0,0,354,59,SS_NOPREFIX
     CONTROL         IDS_BUGTRAP_NAME,IDC_DIALOG_ICON,"Static",SS_BITMAP | WS_GROUP,7,7,15,13
-    LTEXT           "A crash has been detected by BugTrap",IDC_INTRO1,35,7,312,8
-    LTEXT           "To help the development process, this program will try and gather the information about the crash, and the state of your machine at the time of the crash. This data can then be submitted to product support or saved to a file.",IDC_INTRO2,35,19,312,28,SS_NOPREFIX
+    LTEXT           "A crash has been detected",IDC_INTRO1,35,7,312,8
+    LTEXT           "To assist with diagnosing the issue, information about the crash and your system's status at the time of the problem will be gathered. You can choose to submit this data to product support or save it to a file.",IDC_INTRO2,35,19,312,28,SS_NOPREFIX
     LTEXT           "Product support site:",IDC_URL_PREFIX,35,47,71,8
     LTEXT           "",IDC_URL,106,47,241,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ | WS_GROUP,0,59,354,1
@@ -158,8 +158,8 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "",IDC_INTRO_BKGND,0,0,330,53,SS_NOPREFIX
     CONTROL         IDS_BUGTRAP_NAME,IDC_DIALOG_ICON,"Static",SS_BITMAP | WS_GROUP,7,7,15,13
-    LTEXT           "A crash has been detected by BugTrap",IDC_INTRO1,35,7,288,8
-    LTEXT           "To help the development process, this program will try and gather the information about the crash, and the state of your machine at the time of the crash. This data can then be submitted to product support or saved to a file.",IDC_INTRO2,35,19,288,26,SS_NOPREFIX
+    LTEXT           "A crash has been detected",IDC_INTRO1,35,7,288,8
+    LTEXT           "To assist with diagnosing the issue, information about the crash and your system's status at the time of the problem will be gathered. You can choose to submit this data to product support or save it to a file.",IDC_INTRO2,35,19,288,26,SS_NOPREFIX
     CONTROL         "",-1,"Static",SS_ETCHEDHORZ | WS_GROUP,0,52,330,1
     LTEXT           "Product support site:",IDC_URL_PREFIX,7,59,71,8
     LTEXT           "",IDC_URL,78,59,245,10,WS_TABSTOP
