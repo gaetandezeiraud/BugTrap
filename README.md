@@ -1,5 +1,3 @@
-[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
-
 [![Build BugTrap (All Configurations)](https://github.com/gaetandezeiraud/BugTrap/actions/workflows/build.yml/badge.svg)](https://github.com/gaetandezeiraud/BugTrap/actions/workflows/build.yml)
 
 ![GitHub License](https://img.shields.io/github/license/Brouilles/BugTrap)
