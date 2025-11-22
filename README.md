@@ -8,6 +8,8 @@ This project is a fork of https://github.com/bchavez/BugTrap. With a different p
 ## Changelog:    
 * Add support for VS2022 & 2026 (VS2026 recommanded)
 * Add support for https server
+* Upgrade zlib
+* Remove x86 support
 * Remove BugTrap Server Application (deprecated)
 * Remove MFC support
 * Remove German translation
