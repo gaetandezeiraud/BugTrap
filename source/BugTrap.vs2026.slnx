@@ -6,7 +6,6 @@
     <BuildType Name="Release" />
     <BuildType Name="Unicode Debug" />
     <BuildType Name="Unicode Release" />
-    <Platform Name="Win32" />
     <Platform Name="x64" />
   </Configurations>
   <Folder Name="/.nuget/">
