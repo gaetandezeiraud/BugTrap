@@ -624,6 +624,25 @@ extern "C" BUGTRAP_API void APIENTRY BT_SetAppName(PCTSTR pszAppName)
 }
 
 /**
+ * @return application id.
+ */
+extern "C" BUGTRAP_API PCTSTR APIENTRY BT_GetAppId(void)
+{
+	return g_szAppId;
+}
+
+/**
+ * @param pszAppId - application id.
+ */
+extern "C" BUGTRAP_API void APIENTRY BT_SetAppId(PCTSTR pszAppId)
+{
+	if (pszAppId)
+		_tcscpy_s(g_szAppId, countof(g_szAppId), pszAppId);
+	else
+		*g_szAppId = _T('\0');
+}
+
+/**
  * @return user-defined application version number.
  */
 extern "C" BUGTRAP_API PCTSTR APIENTRY BT_GetAppVersion(void)

@@ -2355,6 +2355,7 @@ void CSymEngine::GetTimeStamp(PTSTR pszTimeStamp, DWORD dwTimeStampSize)
 void CSymEngine::GetErrorLog(CUTF8EncStream& rEncStream, CEnumProcess* pEnumProcess)
 {
 	static const CHAR szAppMsg[] = "Application: ";
+	static const CHAR szAppIdMsg[] = "Id: ";
 	static const CHAR szVersionMsg[] = "Version: ";
 	static const CHAR szComputerNameMsg[] = "Computer: ";
 	static const CHAR szComputerIPMsg[] = "IP Address: ";
@@ -2383,6 +2384,13 @@ void CSymEngine::GetErrorLog(CUTF8EncStream& rEncStream, CEnumProcess* pEnumProc
 	{
 		rEncStream.WriteAscii(szAppMsg);
 		rEncStream.WriteUTF8Bin(g_szAppName);
+		rEncStream.WriteAscii(szNewLine);
+	}
+	
+	if (*g_szAppId)
+	{
+		rEncStream.WriteAscii(szAppIdMsg);
+		rEncStream.WriteUTF8Bin(g_szAppId);
 		rEncStream.WriteAscii(szNewLine);
 	}
 

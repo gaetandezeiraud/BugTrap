@@ -4,6 +4,8 @@ EXPORTS
 	; Application title management
 	BT_GetAppName
 	BT_SetAppName
+	BT_GetAppId
+	BT_SetAppId
 	BT_GetAppVersion
 	BT_SetAppVersion
 	BT_ReadVersionInfo

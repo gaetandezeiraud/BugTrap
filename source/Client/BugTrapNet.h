@@ -448,6 +448,12 @@ namespace IntelleSoft
 				void set(String^ value);
 			}
 
+			static property String^ AppId
+			{
+				String ^ get(void);
+				void set(String^ value);
+			}
+
 			static property String^ AppVersion
 			{
 				String^ get(void);
@@ -628,6 +634,17 @@ namespace IntelleSoft
 		{
 			pin_ptr<const wchar_t> wstrAppName(PtrToStringChars(value));
 			BT_SetAppName(wstrAppName);
+		}
+
+		inline String^ ExceptionHandler::AppId::get(void)
+		{
+			return gcnew String(BT_GetAppId());
+		}
+
+		inline void ExceptionHandler::AppId::set(String^ value)
+		{
+			pin_ptr<const wchar_t> wstrAppId(PtrToStringChars(value));
+			BT_SetAppId(wstrAppId);
 		}
 
 		inline String^ ExceptionHandler::AppVersion::get(void)

@@ -190,15 +190,17 @@ static DWORD WSASendReport(PCTSTR pszHostName, CTransferThreadParams* pTransferT
 	if (hFile != INVALID_HANDLE_VALUE)
 	{
 		const DWORD dwAppNameSize = sizeof(DWORD) + countof(g_szAppName) * sizeof(DWORD);
+		const DWORD dwAppIdSize = sizeof(DWORD) + countof(g_szAppId) * sizeof(DWORD);
 		const DWORD dwAppVersionSize = sizeof(DWORD) + countof(g_szAppVersion) * sizeof(DWORD);
 		const DWORD dwReportFileExtensionSize = sizeof(DWORD) + 8 * sizeof(DWORD);
 		const DWORD dwNotificationEMailSize = sizeof(DWORD) + countof(g_szNotificationEMail) * sizeof(DWORD);
 		const DWORD dwMaxHeaderSize =
-						sizeof(DWORD) +            // Protocol signature
-						sizeof(DWORD) +            // Data size
-						sizeof(BYTE) +             // Message type
-						sizeof(DWORD) +            // Message flags
+						sizeof(DWORD) +             // Protocol signature
+						sizeof(DWORD) +             // Data size
+						sizeof(BYTE) +              // Message type
+						sizeof(DWORD) +             // Message flags
 						dwAppNameSize +             // Application name
+						dwAppIdSize + 				// Application Id
 						dwAppVersionSize +          // Application version
 						dwReportFileExtensionSize + // Report file extension
 						dwNotificationEMailSize;    // Notification e-mail
@@ -300,6 +302,13 @@ static DWORD WSASendReport(PCTSTR pszHostName, CTransferThreadParams* pTransferT
 
 						// Application name.
 						if (! WriteBinaryString(EncStream, g_szAppName, pBuffer, nHeaderPosition, dwBufferSize))
+						{
+							dwErrorCode = ERROR_INTERNAL_ERROR;
+							goto end; // Internal error.
+						}
+
+						// Application Id.
+						if (! WriteBinaryString(EncStream, g_szAppId, pBuffer, nHeaderPosition, dwBufferSize))
 						{
 							dwErrorCode = ERROR_INTERNAL_ERROR;
 							goto end; // Internal error.
@@ -711,6 +720,10 @@ static DWORD HTTPSendReport(PCTSTR pszSupportUrl, CTransferThreadParams* pTransf
 
 									EncStream.WriteAscii(TEXT_SECTION_HEADER("appName"));
 									EncStream.WriteUTF8Bin(g_szAppName);
+									EncStream.WriteAscii(SECTION_TRAILER);
+
+									EncStream.WriteAscii(TEXT_SECTION_HEADER("appId"));
+									EncStream.WriteUTF8Bin(g_szAppId);
 									EncStream.WriteAscii(SECTION_TRAILER);
 
 									EncStream.WriteAscii(TEXT_SECTION_HEADER("appVersion"));

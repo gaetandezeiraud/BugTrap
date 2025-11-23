@@ -396,6 +396,15 @@ BUGTRAP_API LPCTSTR APIENTRY BT_GetAppName(void);
  */
 BUGTRAP_API void APIENTRY BT_SetAppName(LPCTSTR pszAppName);
 /**
+ * @brief Get application id.
+ */
+BUGTRAP_API LPCTSTR APIENTRY BT_GetAppId(void);
+/**
+ * @brief Set application Id of the project where BugTrap is used.
+ * Useful for identifying application uniquely by a server.
+ */
+BUGTRAP_API void APIENTRY BT_SetAppId(LPCTSTR pszAppName);
+/**
  * @brief Get application version number.
  */
 BUGTRAP_API LPCTSTR APIENTRY BT_GetAppVersion(void);

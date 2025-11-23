@@ -57,6 +57,8 @@ extern HINSTANCE g_hInstance;
 extern HINSTANCE g_hModule;
 /// Application name.
 extern TCHAR g_szAppName[MAX_PATH];
+/// Application Id.
+extern TCHAR g_szAppId[MAX_PATH];
 /// Application version number.
 extern TCHAR g_szAppVersion[MAX_PATH];
 /// Web address of product support site.
